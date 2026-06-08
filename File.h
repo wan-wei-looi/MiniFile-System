@@ -16,7 +16,7 @@ public:
     void setFileExt(std::string e){extension = e;}
 
     //getters
-    std::string getFile()const{return (name + '.' + extension);}
+    std::string getFileFullName()const{return (name + '.' + extension);}
 };
 
 #endif

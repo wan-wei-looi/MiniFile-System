@@ -14,10 +14,9 @@ private:
     std::vector<Folder*> subfolders;
 
 public:
-    Folder(std::string n, Folder* f_ptr = nullptr)
-        : name(n), parent(f_ptr){}
+    Folder(std::string n, Folder* f_ptr): name(n), parent(f_ptr){}
 
-    ~Folder(){
+    ~Folder(){ 
         for(Folder* sub : subfolders){
             delete sub;
         }
@@ -26,10 +25,9 @@ public:
     void setFolderName(std::string n){name = n;}
     std::string getFolderName()const{return name;}
 
-    Folder* getParent(){return parent;}
-
     //manage file
     void renameFile();
+    
     void addFile(std::string fileName, std::string ext){
         files.push_back(File(fileName, ext));
     }
@@ -45,9 +43,22 @@ public:
     //recursive searching
     Folder* folderSearch(std::string, int = 0);
 
+    //deletion
+    void deleteFile(int);
     //recursive deletion
-    void deleteFile(std::string, int = 0);
-    void deleteFolder(std::string, int = 0);
+    void deleteFolder(Folder*, int = 0);
+
+    //Helper function
+    int getSubfolderCount() const { return subfolders.size(); }
+
+    Folder* getSubfolder(int i) { return subfolders[i]; }
+
+    Folder* getParent(){return parent;}
+
+    int getFileCount()  const { return files.size(); }
+    
+    File getFile(int i)  const { return files[i]; }
+
 };
 
 #endif
