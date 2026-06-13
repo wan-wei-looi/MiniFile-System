@@ -1,12 +1,13 @@
-FOLDER Root/Courses 
-FOLDER Root/Courses/OOP 
-FOLDER Root/Courses/Database 
-FOLDER Root/Images 
-FOLDER Root/Projects 
-FOLDER Root/Projects/FYP 
-FILE Root/report txt 
-FILE Root/Courses/OOP/assignment.docx 
-FILE Root/Courses/OOP/notes.pdf 
-FILE Root/Courses/Database/lab.sql 
-FILE Root/Images/diagram.png 
+FOLDER Root/Courses
+FOLDER Root/Courses/OOP
+FOLDER Root/Courses/Database
+FOLDER Root/Images
+FOLDER Root/Projects
+FOLDER Root/Projects/FYP
+
+FILE Root/report.txt
+FILE Root/Courses/OOP/assignment.docx
+FILE Root/Courses/OOP/notes.pdf
+FILE Root/Courses/Database/lab.sql
+FILE Root/Images/diagram.png
 FILE Root/Projects/FYP/proposal.docx

@@ -7,130 +7,110 @@
 
 using namespace std;
 
-void Folder::renameFile(){
-     string name("");
-     string ext("");
-     //display file names and index
-     int index = 0;
-     for(File fl : files){
-          cout << endl;
-          cout << index++ << ".\t";
-          fl.getFile();
-          cout << endl;
-     }
-
-     //let user pick the index
-     cout << endl;
-     cout << "Please select the file you wish to manage: ";
-     cin >> index; cin.ignore(); --index;
-
-     //access the file object
-     //use setFileName() & setFileExt()
-     cout << endl;
-     cout << "Please rename your file: (original file name: " + files[index].getFile() + ")";
-     cout << endl;
-     getline(cin,name,'.'); getline(cin,ext);
-     files[index].setFileName(name);
-     files[index].setFileExt(ext);
-
-     cout << endl;
-     cout << "Congratulations, file successfully renamed to " + files[index].getFile();
-     cout << endl;
-}
-
-void Folder::renameSubFolder(){
-     string name("");
-
-     //display file names and index
-     int index = 0;
-     for(Folder* f_ptr : subfolders){
-          cout << endl;
-          cout << index++ << ".\t";
-          f_ptr->getFolderName();
-          cout << endl;
-     }
+void Folder::folderPrintTree(string prefix, bool isLast)const{
     
-     //let user pick the index
-     cout << endl;
-     cout << "Please select the folder you wish to manage: ";
-     cin >> index; cin.ignore(); --index;
+    //Display subfolder
+    //Prefix is the line to connect all of the parent of parents
+    
+    for(int sub = 0; sub < subfolders.size(); sub++){
 
-     //access the file object
-     cout << endl;
-     cout << "Please rename your folder: (original file name: " + subfolders[index]->getFolderName() + ")";
-     cout << endl;
-     getline(cin,name);
-     subfolders[index]->setFolderName(name);
+        isLast = (sub == subfolders.size() - 1 && files.empty()) ? true : false;
 
-     cout << endl;
-     cout << "Congratulations, folder successfully renamed to " + subfolders[index]->getFolderName();
-     cout << endl;
+        cout << prefix << ((isLast) ? "└── " : "├── ")
+             << subfolders[sub]->name << endl;
+
+        string newPrefix = prefix + ((isLast) ? "    " : "│   ");
+        subfolders[sub]->folderPrintTree(newPrefix, isLast);
+    }
+    
+    //Display files
+    for(int f = 0; f < files.size(); f++){
+        cout << prefix;
+        cout << ((f != files.size() - 1) ? "├── " : "└── ");
+        cout << files[f].getFileFullName() << endl;
+    }
 }
 
-void Folder::folderTraversal(string prefix, bool isLast)const{
-     for(int sub = 0; sub < subfolders.size(); sub++){
-          isLast = (sub == subfolders.size() - 1 && files.empty())? true : false;
-          cout << prefix << ((isLast)? "└── " : "├── ")
-               << subfolders[sub]->name << endl;
-          string newPrefix = prefix + ((isLast)? "    " : "│   ");
-          subfolders[sub]->folderTraversal(newPrefix, isLast);
-     }
-     
-     for(int f = 0; f < files.size(); f++){
-          cout << prefix;
-          cout << ((f != files.size() - 1)? "├── ": "└── ");
-          cout << files[f].getFile() << endl;
-     }
-}
-
-Folder* Folder::folderSearch(string folderName, int index){
-     if(index >= 0 && index < subfolders.size()){
-          if(folderName == subfolders[index]->getFolderName()){
-               return subfolders[index];
-          }else{
-               Folder* folder = subfolders[index]->folderSearch(folderName);
-               if(folder != nullptr){
-                    return folder;
-               }else{
-                    return folderSearch(folderName, index + 1);
+File* Folder::fileSearch(const string& fileName, bool showPath){
+     for(File& file : files){
+          if(fileName == file.getFileFullName()){
+               if(showPath){
+                    cout << "[LOCATION]: ";
+                    cout << this->folderTraverse();
+                    cout << endl;
                }
+               return &file;
           }
-     }else{
-          return nullptr;
      }
+     for(Folder* sub : subfolders){
+          File* result = sub->fileSearch(fileName, showPath);
+          if(result != nullptr){
+               return result;
+          }
+     }
+     return nullptr;
 }
 
-void Folder::deleteFile(string fileName, int index){
+Folder* Folder::folderSearch(const string& folderName){
+     for(Folder* sub : subfolders){
+          if(folderName == sub->getFolderName()){
+               return sub;
+          }
+          Folder* result = sub->folderSearch(folderName);
+          if(result != nullptr){
+               return result;
+          }
+     }
+     return nullptr;
+}
+
+bool Folder::deleteFile(string fileName, int index){
      if(index >= 0 && index < files.size()){
-          if(fileName == files[index].getFile()){
-               while(index >= 0 && index < (files.size() - 1)){
-                    files[index] = files[++index];
-               }
-               files.pop_back();
+          if(fileName == files[index].getFileFullName()){
+               files.erase(files.begin() + index);
+               return true;
           }else{
-               deleteFile(fileName, index + 1);
+               return deleteFile(fileName, index + 1);
           }
      }else{
-          cout << endl;
-          cout << "This file does not exist, please check again";
-          cout << endl;
+          return false;
      }
 }
 
-void Folder::deleteFolder(string folderName, int index){
+bool Folder::deleteFolder(string folderName, int index){
      if(index >= 0 && index < subfolders.size()){
           if(folderName == subfolders[index]->getFolderName()){
                delete subfolders[index];
-               while(index >= 0 && index < (subfolders.size() - 1)){
-                    subfolders[index] = subfolders[++index];
-               }
-               subfolders.pop_back();
+               subfolders.erase(subfolders.begin() + index);
+               return true;
           }else{
-               deleteFolder(folderName, index + 1);
+               return deleteFolder(folderName, index + 1);
           }
      }else{
-          cout << endl;
-          cout << "This folder does not exist, please check again";
-          cout << endl;
+          return false;
+     }
+}
+
+string Folder::folderTraverse(){
+     if(this->getParent() != nullptr){
+          return (this->getParent()->folderTraverse() + "/" + getFolderName());
+     }else{
+          return this->getFolderName();
+     }
+}
+
+void Folder::printFileList()const{
+     int index = 1;
+     for(File file : files){
+          cout << "[FILE " << index++ << "]: "
+               << file.getFileFullName() << endl;
+     }
+}
+
+void Folder::printSubfolderList()const{
+     int index = 1;
+     for(Folder* sub : subfolders){
+          cout << "[Folder " << index++ << "]: "
+               << sub->getFolderName() << endl;
      }
 }

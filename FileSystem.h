@@ -2,36 +2,50 @@
 #define FILESYSTEM_H
 
 #include <iostream>
-#include <fstream>
 #include <string>
-#include <vector>
-
-#include "File.h"
+#include <fstream>
 #include "Folder.h"
+#include "File.h"
 
-class FileSystem{
+using namespace std;
+
+class FileSystem {
 private:
-    Folder root;
-    Folder* activeFolder;
+    Folder* root;
+    Folder* current;
 
 public:
-    FileSystem() : root("system67"){}
+    FileSystem(string filename);
+    ~FileSystem();
+    void run();
 
-    //manage current folder
-    //load file structure from file
-    //manage menu operations
-    //coordinate system operations:
-        //create folder
-        //creare file
-        //display current folder
-        //display full folder tree
-        //search file
-        //enter folder
-        //go back to parent folder
-        //delete file
-        //delete folder
-        //show current path
-        //exit
+    // exception handling class
+    class ExceptionHandling{
+    private:
+        string errorMsg;
+    public:
+        ExceptionHandling(string msg) : errorMsg(msg){}
+        string getErrorMsg()const{return errorMsg;}
+
+    };
+
+    // helpers
+    void loadFromFile(string filename);
+    bool recursiveSearch(Folder* node, string target, string& foundPath, string currentPath);
+
+    // menu operations
+    void createFolder();
+    void createFile();
+    void displayCurrentFolder();
+    void displayFullTree();
+    void searchFile();
+    void enterFolder();
+    void goBack();
+    void renameFile();
+    void removeFile();
+    void renameFolder();
+    void removeFolder();
+    void showCurrentPath();
 };
 
 #endif
