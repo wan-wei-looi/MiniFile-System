@@ -3,20 +3,23 @@
 
 #include <iostream>
 #include <string>
+
+using namespace std;
+
 class File{
 private:
-    std::string name;
-    std::string extension;
+    string name;
+    string extension;
 public:
     //constructor
-    File(std::string n, std::string e): name(n), extension(e){}
+    File(string n, string e): name(n), extension(e){}
 
     //setters
-    void setFileName(std::string n){name = n;}
-    void setFileExt(std::string e){extension = e;}
+    void setFileName(string n){name = n;}
+    void setFileExt(string e){extension = e;}
 
     //getters
-    std::string getFileFullName()const{return (name + '.' + extension);}
+    string getFileFullName()const{return (name + '.' + extension);}
 };
 
 #endif

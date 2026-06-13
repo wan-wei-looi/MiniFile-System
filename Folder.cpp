@@ -31,24 +31,29 @@ void Folder::folderPrintTree(string prefix, bool isLast)const{
     }
 }
 
-File* Folder::fileSearch(const string& fileName, bool showPath){
+File* Folder::fileSearch(const string& fileName, bool deepSearch){
+     File* match = nullptr;
      for(File& file : files){
           if(fileName == file.getFileFullName()){
-               if(showPath){
+               if(deepSearch){
                     cout << "[LOCATION]: ";
                     cout << this->folderTraverse();
                     cout << endl;
                }
-               return &file;
+               if(match == nullptr){
+                    match = &file;
+               }
           }
      }
-     for(Folder* sub : subfolders){
-          File* result = sub->fileSearch(fileName, showPath);
-          if(result != nullptr){
-               return result;
+     if(deepSearch){
+          for(Folder* sub : subfolders){
+               File* result = sub->fileSearch(fileName, deepSearch);
+               if(result != nullptr && match == nullptr){
+                    match = result;
+               }
           }
      }
-     return nullptr;
+     return match;
 }
 
 Folder* Folder::folderSearch(const string& folderName){

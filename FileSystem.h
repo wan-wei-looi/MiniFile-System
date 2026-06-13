@@ -19,7 +19,7 @@ public:
     ~FileSystem();
     void run();
 
-    // exception handling class
+    //exception handling class
     class ExceptionHandling{
     private:
         string errorMsg;
@@ -29,11 +29,10 @@ public:
 
     };
 
-    // helpers
+    //read from file
     void loadFromFile(string filename);
-    bool recursiveSearch(Folder* node, string target, string& foundPath, string currentPath);
 
-    // menu operations
+    //menu operations
     void createFolder();
     void createFile();
     void displayCurrentFolder();

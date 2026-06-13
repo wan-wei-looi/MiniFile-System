@@ -18,7 +18,8 @@ private:
 public:
     Folder(string n, Folder* f_ptr = nullptr): name(n), parent(f_ptr){}
 
-    ~Folder(){ 
+    ~Folder(){
+        delete parent; 
         for(Folder* sub : subfolders){
             delete sub;
         }
@@ -28,13 +29,11 @@ public:
     string getFolderName()const{return name;}
 
     //manage file
-    void renameFile();
     void addFile(string fileName, string ext){
         files.push_back(File(fileName, ext));
     }
 
     //manage subfolder
-    void renameSubFolder();
     void addSubfolder(string folderName){
         subfolders.push_back(new Folder(folderName, this));
     }
