@@ -38,7 +38,7 @@ FileSystem::~FileSystem(){
 void FileSystem::run(){
     menuOptions userChoice;
     do{
-        cout << "===============Menu===============";
+        cout << "\n===============Menu===============";
         showCurrentPath();
         cout << "==================================\n"
              << "1.  Create File\n"
