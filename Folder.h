@@ -19,7 +19,6 @@ public:
     Folder(string n, Folder* f_ptr = nullptr): name(n), parent(f_ptr){}
 
     ~Folder(){
-        delete parent; 
         for(Folder* sub : subfolders){
             delete sub;
         }

@@ -25,7 +25,7 @@ enum menuOptions{
 };
 
 FileSystem::FileSystem(string filename){
-    root = new Folder("System67");
+    root = new Folder("Root");
     current = root; 
     loadFromFile(filename);
 }
