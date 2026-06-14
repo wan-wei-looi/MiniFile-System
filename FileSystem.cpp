@@ -289,7 +289,7 @@ void FileSystem::searchFile(){
     if(fileName.empty()){
         throw ExceptionHandling("Empty input is invalid.");
     }
-    File* result = current->fileSearch(fileName, true);
+    File* result = root->fileSearch(fileName, true);
     if(result == nullptr){
         throw ExceptionHandling("File does not exist in the current folder and its subfolders.");
     }
