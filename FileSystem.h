@@ -19,14 +19,21 @@ public:
     ~FileSystem();
     void run();
 
-    //exception handling class
+    //exception handling classes
     class ExceptionHandling{
     private:
         string errorMsg;
     public:
         ExceptionHandling(string msg) : errorMsg(msg){}
         string getErrorMsg()const{return errorMsg;}
+    };
 
+    class InvalidRange{
+    private:
+        string errorMsg;
+    public:
+        InvalidRange(string msg) : errorMsg(msg){}
+        string getErrorMsg()const{return errorMsg;}
     };
 
     //read from file

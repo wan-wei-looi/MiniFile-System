@@ -58,8 +58,7 @@ void FileSystem::run(){
              << "Enter your choice: ";
         
         string input;
-        cin >> input;
-        cin.ignore();
+        getline(cin,input);
         cout << "==================================\n";
         try{
             userChoice = static_cast<menuOptions>(stoi(input));
@@ -92,11 +91,14 @@ void FileSystem::run(){
 
                 case EXIT: cout << "Exiting program. Goodbye!\n"; break;
 
-                default: cout << "Invalid choice. Please try again.\n";
+                default: cout << "\nInvalid choice. Please try again.\n";
             }
         }
         catch(invalid_argument){
-            cout << "Invalid choice. Please try again.\n";
+            cout << "\nInvalid choice. Please try again.\n";
+        }
+        catch(const ExceptionHandling& error){
+            cout << "\n[Error] : " << error.getErrorMsg() << "\n";
         }
     }while(userChoice != EXIT);
 }
@@ -201,30 +203,24 @@ void FileSystem::createFolder(){
     cout << "\nEnter folder name: ";
     getline(cin, folderName);
 
-    try {
-        //check 1: empty name
-        if(folderName.empty())
-            throw ExceptionHandling("Folder name cannot be empty.");
+    //check 1: empty name
+    if(folderName.empty())
+        throw ExceptionHandling("Folder name cannot be empty.");
 
-        //check 2: duplicate name
-        Folder* duplicateFolder = current->folderSearch(folderName);
-        if(duplicateFolder != nullptr){
-            throw ExceptionHandling("Folder '" + folderName + "' already exists.");
-        }
-
-        //check 3: blank spaces
-        if(folderName == " " || folderName == "\t"){
-            throw ExceptionHandling("Folder name can not only contain black spaces.");
-        }
-
-        //passed all checks, safe to create
-        current->addSubfolder(folderName);
-        cout << "\nFolder '" << folderName << "' created successfully.\n";
-
+    //check 2: duplicate name
+    Folder* duplicateFolder = current->folderSearch(folderName);
+    if(duplicateFolder != nullptr){
+        throw ExceptionHandling("Folder '" + folderName + "' already exists.");
     }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << "\n";
+
+    //check 3: blank spaces
+    if(folderName == " " || folderName == "\t"){
+        throw ExceptionHandling("Folder name can not only contain black spaces.");
     }
+
+    //passed all checks, safe to create
+    current->addSubfolder(folderName);
+    cout << "\nFolder '" << folderName << "' created successfully.\n";    
 }
 
 void FileSystem::createFile(){
@@ -232,35 +228,30 @@ void FileSystem::createFile(){
     cout << "\nEnter file name (with extension): ";
     getline(cin, fileName);
 
-    try {
-        ////check 1: empty name
-        if(fileName.empty())
-            throw ExceptionHandling("File name cannot be empty.");
-        
-        //check 2: blank spaces
-        if(fileName == " " || fileName == "\t"){
-            throw ExceptionHandling("Folder name can not only contain black spaces.");
-        }
+    ////check 1: empty name
+    if(fileName.empty())
+        throw ExceptionHandling("File name cannot be empty.");
+    
+    //check 2: blank spaces
+    if(fileName == " " || fileName == "\t"){
+        throw ExceptionHandling("Folder name can not only contain black spaces.");
+    }
 
-        //check 3: no extension
-        int dotPosition = fileName.rfind('.');
-        if(dotPosition >= fileName.size() - 1){
-            throw ExceptionHandling("File does not have an extension.");
-        }
-        
-        //check 4: duplicate full name
-        File* duplicateFile = current->fileSearch(fileName);
-        if(duplicateFile != nullptr){
-            throw ExceptionHandling("File '" + fileName + "' already exists here.");
-        }
-        
-        //passed all checks, safe to create
-        current->addFile(fileName.substr(0, dotPosition), fileName.substr(dotPosition + 1));
-        cout << "\nFile '" << fileName << "' created successfully.\n";
+    //check 3: no extension
+    int dotPosition = fileName.rfind('.');
+    if(dotPosition >= fileName.size() - 1){
+        throw ExceptionHandling("File does not have an extension.");
     }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << "\n";
+    
+    //check 4: duplicate full name
+    File* duplicateFile = current->fileSearch(fileName);
+    if(duplicateFile != nullptr){
+        throw ExceptionHandling("File '" + fileName + "' already exists here.");
     }
+    
+    //passed all checks, safe to create
+    current->addFile(fileName.substr(0, dotPosition), fileName.substr(dotPosition + 1));
+    cout << "\nFile '" << fileName << "' created successfully.\n";
 }
 
 void FileSystem::displayCurrentFolder(){
@@ -276,11 +267,11 @@ void FileSystem::displayCurrentFolder(){
     }
 
     for(int i = 0; i < current->getSubfolderCount(); i++){
-        cout << "[FOLDER]: " << current->getSubfolder(i)->getFolderName() << endl;
+        cout << "[FOLDER] : " << current->getSubfolder(i)->getFolderName() << endl;
     }
 
     for(int i = 0; i < current->getFileCount(); i++){
-        cout << "[FILE]: " << current->getFile(i).getFileFullName() << endl;
+        cout << "[FILE] : " << current->getFile(i).getFileFullName() << endl;
     }
 }
 
@@ -295,17 +286,12 @@ void FileSystem::searchFile(){
     cout << "\nEnter file name to search (e.g. notes.pdf): ";
     getline(cin, fileName);
 
-    try{
-        if(fileName.empty()){
-            throw ExceptionHandling("Empty input is invalid.");
-        }
-        File* result = current->fileSearch(fileName, true);
-        if(result == nullptr){
-            throw ExceptionHandling("File does not exist in the current folder and its subfolders.");
-        }
+    if(fileName.empty()){
+        throw ExceptionHandling("Empty input is invalid.");
     }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << "\n";
+    File* result = current->fileSearch(fileName, true);
+    if(result == nullptr){
+        throw ExceptionHandling("File does not exist in the current folder and its subfolders.");
     }
 }
 
@@ -315,35 +301,26 @@ void FileSystem::enterFolder(){
     cout << "\nEnter folder name to enter: ";
     getline(cin, folderName);
 
-    try {
-        if(folderName.empty()){
-            throw ExceptionHandling("Folder name cannot be empty.");
-        }
-        /*
-        system prioritise entering the first folder with input name
-        when there exist subfolders with the same name
-        */
-        if(current->folderSearch(folderName) == nullptr){
-            throw ExceptionHandling("Folder '" + folderName + "' does not exist");
-        };
-        current = current->folderSearch(folderName);
+    if(folderName.empty()){
+        throw ExceptionHandling("Folder name cannot be empty.");
     }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << "\n";
-    }
+    /*
+    system prioritise entering the first folder with input name
+    when there exist subfolders with the same name
+    */
+    if(current->folderSearch(folderName) == nullptr){
+        throw ExceptionHandling("Folder '" + folderName + "' does not exist");
+    };
+    current = current->folderSearch(folderName);    
 }
 
 void FileSystem::goBack(){
-    try{
-        if(current->getParent() == nullptr){
-            throw ExceptionHandling("Already at Root. Cannot go further back.");
-        }
-        current = current->getParent();
-        cout << "\nMoved back to: " << current->getFolderName() << "\n";
+
+    if(current->getParent() == nullptr){
+        throw ExceptionHandling("Already at Root. Cannot go further back.");
     }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << "\n";
-    }
+    current = current->getParent();
+    cout << "\nMoved back to: " << current->getFolderName() << "\n";
 }
 
 void FileSystem::renameFile(){
@@ -366,11 +343,11 @@ void FileSystem::renameFile(){
     while(true){
         try{
             if(choice > current->getFileCount() || choice < 1){
-                throw ExceptionHandling("Invalid choice, please choose within range: ");
+                throw InvalidRange("Invalid choice, please choose within range: ");
             }
             break;
         }
-        catch(const ExceptionHandling& error){
+        catch(const InvalidRange& error){
             cout << error.getErrorMsg();
             cout << "1 to " << current->getFileCount() << endl;
             cout << "Input: ";
@@ -391,38 +368,32 @@ void FileSystem::renameFile(){
     string fileName;
     getline(cin, fileName);
 
-    try {
-        ////check 1: empty name
-        if(fileName.empty())
-            throw ExceptionHandling("File name cannot be empty.");
-        
-        //check 2: blank spaces
-        if(fileName == " " || fileName == "\t"){
-            throw ExceptionHandling("Folder name can not only contain black spaces.");
-        }
-
-        //check 3: no extension
-        int dotPosition = fileName.rfind('.');
-        if(dotPosition >= fileName.size() - 1){
-            throw ExceptionHandling("File does not have an extension.");
-        }
-        
-        //check 4: duplicate full name
-        File* duplicateFile = current->fileSearch(fileName);
-        if(duplicateFile != nullptr){
-            throw ExceptionHandling("File '" + fileName + "' already exists here.");
-        }
-
-        //passed all tests, safe to rename
-        current->getFile(choice).setFileName(fileName.substr(0, dotPosition));
-        current->getFile(choice).setFileExt(fileName.substr(dotPosition + 1));
-        cout << endl
-             << "File renamed successfully to " << current->getFile(choice).getFileFullName() << endl;
-    }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << "\n";
+    ////check 1: empty name
+    if(fileName.empty())
+        throw ExceptionHandling("File name cannot be empty.");
+    
+    //check 2: blank spaces
+    if(fileName == " " || fileName == "\t"){
+        throw ExceptionHandling("Folder name can not only contain black spaces.");
     }
 
+    //check 3: no extension
+    int dotPosition = fileName.rfind('.');
+    if(dotPosition >= fileName.size() - 1){
+        throw ExceptionHandling("File does not have an extension.");
+    }
+    
+    //check 4: duplicate full name
+    File* duplicateFile = current->fileSearch(fileName);
+    if(duplicateFile != nullptr){
+        throw ExceptionHandling("File '" + fileName + "' already exists here.");
+    }
+
+    //passed all tests, safe to rename
+    current->getFile(choice).setFileName(fileName.substr(0, dotPosition));
+    current->getFile(choice).setFileExt(fileName.substr(dotPosition + 1));
+    cout << endl
+         << "File renamed successfully to " << current->getFile(choice).getFileFullName() << endl;
 }
 
 void FileSystem::renameFolder(){
@@ -444,11 +415,21 @@ void FileSystem::renameFolder(){
     cin.ignore();
     
     //input viladation: ensure choice within range of file couunt
-    while(choice > current->getSubfolderCount() || choice < 1){
-        cout << "Invalid choice, please choose within range 1-" << current->getSubfolderCount() << ": ";
-        cin >> choice;
-        cin.ignore();
+    while(true){
+        try{
+            if(choice > current->getSubfolderCount() || choice < 1){
+                throw InvalidRange("Invalid choice, please choose within range: ");
+            }
+            break;
+        }
+        catch(const InvalidRange& error){
+            cout << error.getErrorMsg();
+            cout << "1 to " << current->getSubfolderCount() << endl;
+            cout << "Input: ";
+            cin >> choice; cin.ignore();
+        }
     }
+    
     choice--; //adjust choice to align with 0-based indexing
 
     //rename the subfolder object
@@ -462,30 +443,25 @@ void FileSystem::renameFolder(){
     cout << "\nEnter folder name: ";
     getline(cin, folderName);
 
-    try {
-        //check 1: empty name
-        if(folderName.empty())
-            throw ExceptionHandling("Folder name cannot be empty.");
+    //check 1: empty name
+    if(folderName.empty())
+        throw ExceptionHandling("Folder name cannot be empty.");
 
-        //check 2: duplicate name
-        Folder* duplicateFolder = current->folderSearch(folderName);
-        if(duplicateFolder != nullptr){
-            throw ExceptionHandling("Folder '" + folderName + "' already exists.");
-        }
-
-        //check 3: blank spaces
-        if(folderName == " " || folderName == "\t"){
-            throw ExceptionHandling("Folder name can not only contain black spaces.");
-        }
-
-        //passed both checks, safe to rename
-        current->getSubfolder(choice)->setFolderName(folderName);
-        cout << endl
-             << "Folder renamed successfully to " << current->getSubfolder(choice)->getFolderName() << endl;
-
-    } catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << "\n";
+    //check 2: duplicate name
+    Folder* duplicateFolder = current->folderSearch(folderName);
+    if(duplicateFolder != nullptr){
+        throw ExceptionHandling("Folder '" + folderName + "' already exists.");
     }
+
+    //check 3: blank spaces
+    if(folderName == " " || folderName == "\t"){
+        throw ExceptionHandling("Folder name can not only contain black spaces.");
+    }
+
+    //passed both checks, safe to rename
+    current->getSubfolder(choice)->setFolderName(folderName);
+    cout << endl
+         << "Folder renamed successfully to " << current->getSubfolder(choice)->getFolderName() << endl;
 }
 
 void FileSystem::removeFile(){
@@ -506,16 +482,10 @@ void FileSystem::removeFile(){
     getline(cin, fileName);
 
     //checks if deletefolder() is able to delete the folder
-    try{
-        if(!root->deleteFile(fileName)){
-            throw ExceptionHandling("File is not found, please try again.");
-        }
-        cout << "\nFile '" << fileName << "' deleted successfully.\n";
+    if(!root->deleteFile(fileName)){
+        throw ExceptionHandling("File is not found, please try again.");
     }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << endl;
-    }
-
+    cout << "\nFile '" << fileName << "' deleted successfully.\n";
 }
 
 void FileSystem::removeFolder(){
@@ -536,16 +506,10 @@ void FileSystem::removeFolder(){
     getline(cin, subfolderName);
 
     //checks if deletefolder() is able to delete the folder
-    try{
         if(!root->deleteFolder(subfolderName)){
             throw ExceptionHandling("Folder is not found, please try again.");
         }
         cout << "\nFolder '" << subfolderName << "' and all its contents deleted successfully.\n";
-    }
-    catch(const ExceptionHandling& error){
-        cout << "\nError: " << error.getErrorMsg() << endl;
-    }
-
 }
 
 void FileSystem::showCurrentPath(){

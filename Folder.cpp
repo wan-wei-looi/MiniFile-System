@@ -36,7 +36,7 @@ File* Folder::fileSearch(const string& fileName, bool deepSearch){
      for(File& file : files){
           if(fileName == file.getFileFullName()){
                if(deepSearch){
-                    cout << "[LOCATION]: ";
+                    cout << "[LOCATION] : ";
                     cout << this->folderTraverse();
                     cout << endl;
                }
@@ -107,7 +107,7 @@ string Folder::folderTraverse(){
 void Folder::printFileList()const{
      int index = 1;
      for(File file : files){
-          cout << "[FILE " << index++ << "]: "
+          cout << "[FILE " << index++ << "] : "
                << file.getFileFullName() << endl;
      }
 }
@@ -115,7 +115,7 @@ void Folder::printFileList()const{
 void Folder::printSubfolderList()const{
      int index = 1;
      for(Folder* sub : subfolders){
-          cout << "[Folder " << index++ << "]: "
+          cout << "[Folder " << index++ << "] : "
                << sub->getFolderName() << endl;
      }
 }
